@@ -24,7 +24,7 @@ const Icon: FC<IconProps> = ({color, size, name, iconFamily}) => {
           color={color}
           size={RFValue(size)}
         />
-      )}{' '}
+      )}
       {iconFamily === 'MaterialIcons' && (
         <MaterialIcons name={name} color={color} size={RFValue(size)} />
       )}

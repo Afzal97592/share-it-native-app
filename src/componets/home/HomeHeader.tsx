@@ -4,16 +4,21 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {homeHeaderStyles} from '../../styles/homeHeaderStyles';
 import {commonStyles} from '../../styles/commonStyles';
 import Icon from '../global/Icon';
 import Svg, {Path, Defs, LinearGradient, Stop} from 'react-native-svg';
 import {screenHeight, screenWidth, svgPath} from '../../utils/Constants';
+import QRGenerateModal from '../modals/QRGenerateModal';
 
 const HomeHeader = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const {width} = useWindowDimensions();
+  const dynamicViewBox = `0 0 1140 ${width - 70}`;
   return (
     <View style={homeHeaderStyles.mainContainer}>
       <SafeAreaView />
@@ -25,7 +30,7 @@ const HomeHeader = () => {
           source={require('../../assets/images/logo_t.png')}
           style={homeHeaderStyles.logo}
         />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setIsVisible(true)}>
           <Image
             source={require('../../assets/images/profile.jpg')}
             style={homeHeaderStyles.profile}
@@ -36,7 +41,7 @@ const HomeHeader = () => {
       <Svg
         height={screenHeight * 0.1}
         width={screenWidth}
-        viewBox="0 0 1140 350"
+        viewBox={dynamicViewBox}
         style={homeHeaderStyles.curve}>
         <Defs>
           <LinearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
@@ -47,6 +52,12 @@ const HomeHeader = () => {
         <Path fill="#80BFFF" d={svgPath} />
         <Path fill="url(#gradient)" d={svgPath} />
       </Svg>
+      {isVisible && (
+        <QRGenerateModal
+          visible={isVisible}
+          onClose={() => setIsVisible(false)}
+        />
+      )}
     </View>
   );
 };
