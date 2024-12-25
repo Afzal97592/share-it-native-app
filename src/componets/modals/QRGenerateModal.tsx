@@ -23,6 +23,9 @@ import Animated, {
 import {Image} from 'react-native';
 import {multiColor} from '../../utils/Constants';
 import DeviceInfo from 'react-native-device-info';
+import {useTCP} from '../../services/TCPProvider';
+import {navigate} from '../../utils/NavigationUtil';
+import {getLocalIPAddress} from '../../utils/networkUtils';
 
 interface ModalProps {
   visible: boolean;
@@ -30,6 +33,7 @@ interface ModalProps {
 }
 
 const QRGenerateModal: FC<ModalProps> = ({visible, onClose}) => {
+  const {isConnected, startServer, server} = useTCP();
   const [loading, setIsLoading] = useState(true);
   const [qrValue, setQrValue] = useState('Afzal');
   const shimmarTranslateX = useSharedValue(-300);
@@ -52,6 +56,16 @@ const QRGenerateModal: FC<ModalProps> = ({visible, onClose}) => {
 
   const setUpServer = async () => {
     const deviceName = await DeviceInfo.getDeviceName();
+    const ip = await getLocalIPAddress();
+    const port = 4000;
+    if (server) {
+      setQrValue(`tcp://${ip}:${port}${deviceName}`);
+      setIsLoading(false);
+      return;
+    }
+    startServer(port);
+    setQrValue(`tcp://${ip}:${port}${deviceName}`);
+    console.log(`Server Ino : ${ip}, ${port}`);
     setIsLoading(false);
   };
 
@@ -62,6 +76,13 @@ const QRGenerateModal: FC<ModalProps> = ({visible, onClose}) => {
       false,
     );
   }, [shimmarTranslateX]);
+
+  useEffect(() => {
+    if (isConnected) {
+      onClose();
+      navigate('ConnectionScreen');
+    }
+  }, [isConnected]);
 
   return (
     <Modal
